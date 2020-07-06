@@ -164,7 +164,7 @@ public class FrmBusinessManager extends JDialog implements ActionListener{
 				return;
 			}
 			BeanBusiness b=this.businesses.get(i);
-			FrmCouponManager dlg=new FrmCouponManager(this,"满减方案",true,b.getBusinessid());
+			FrmBusinessMore dlg=new FrmBusinessMore(this,"满减方案",true,b.getBusinessid());
 			dlg.setVisible(true);
 				this.reloadTable();
 		}

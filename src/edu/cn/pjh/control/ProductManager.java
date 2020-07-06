@@ -22,8 +22,9 @@ public class ProductManager implements IProductManager{
 		java.sql.PreparedStatement pst=null;
 		try {
 			conn=DBUtil.getConnection();
-			sql="select pro_id,pro_name,pro_price,pro_vipprice,pro_num,tpe_id from pp_product ";			
-
+			sql="select pro_id,pro_name,pro_price,pro_vipprice,pro_num,tpe_id from pp_product where tpe_id=?";			
+			pst=conn.prepareStatement(sql);
+			pst.setInt(1, typeid);
 			java.sql.ResultSet rs=pst.executeQuery();
 			while(rs.next()){
 				BeanProduct u=new BeanProduct();
@@ -78,9 +79,10 @@ public class ProductManager implements IProductManager{
 			rs.next();
 			int tpenum=rs.getInt(1);
 			
-			sql="update pp_product_types set tpe_num where tpe_id=?";
+			sql="update pp_product_types set tpe_num=? where tpe_id=?";
 			pst=conn.prepareStatement(sql);
 			pst.setInt(1, tpenum);
+			pst.setInt(2, typeid);
 			pst.execute();
 			pst.close();
 		} catch (SQLException e) {

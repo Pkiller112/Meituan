@@ -12,13 +12,17 @@ import java.util.List;
 import edu.cn.pjh.itf.IConsumerManager;
 import edu.cn.pjh.model.BeanConsumer;
 import edu.cn.pjh.model.BeanRider;
+import edu.cn.pjh.model.BeanUser;
 import edu.cn.pjh.util.BaseException;
 import edu.cn.pjh.util.BusinessException;
 import edu.cn.pjh.util.DBUtil;
 import edu.cn.pjh.util.DbException;
 
 public class ConsumerManager implements IConsumerManager{
+	public static BeanConsumer currentConsumer=null;
 	public List<BeanConsumer> searchConsumers(String State,String content) throws BaseException{
+		
+		
 		List<BeanConsumer> result=new ArrayList<BeanConsumer>();
 		Connection conn=null;
 		String sql=null;
@@ -243,5 +247,43 @@ public class ConsumerManager implements IConsumerManager{
 					e.printStackTrace();
 				}
 		}	
+	}
+	public BeanConsumer loadConsumer(String csmracc)throws BaseException{
+		Connection conn=null;
+		try {
+			conn=DBUtil.getConnection();
+			String sql="select csmr_id,register_time,csmr_name,csmr_sex,csmr_account,csmr_pwd,csmr_phone,ifvip,vipddl from pp_consumer where csmr_account=?";
+			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
+			pst.setString(1,csmracc);
+			java.sql.ResultSet rs=pst.executeQuery();
+			if(!rs.next()) throw new BusinessException("µÇÂ½ÕËºÅ²»´æÔÚ");
+			
+			BeanConsumer u=new BeanConsumer();
+			u.setConsumerid(rs.getInt(1));
+			u.setRegisterTime(rs.getTimestamp(2));
+			u.setConsumername(rs.getString(3));
+			u.setConsumersex(rs.getString(4));
+			u.setConsumeraccount(rs.getString(5));
+			u.setConsumerpwd(rs.getString(6));
+			u.setConsumerphone(rs.getString(7));
+			u.setIfvip(rs.getString(8));
+			u.setVipDDL(rs.getString(9));
+			rs.close();
+			pst.close();
+			return u;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new DbException(e);
+		}
+		finally{
+			if(conn!=null)
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		
 	}
 }

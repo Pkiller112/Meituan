@@ -13,4 +13,5 @@ public class PPutil {
 	public static ICouponManager CouponManager=new CouponManager();
 	public static ISchemeManager SchemeManager=new SchemeManager();
 	public static IOrderManager OrderManager=new OrderManager();
+	public static IAddressManager AddressManager=new AddressManager();
 }

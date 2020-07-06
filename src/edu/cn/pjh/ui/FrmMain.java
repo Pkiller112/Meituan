@@ -15,6 +15,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
+import edu.cn.pjh.control.ConsumerManager;
 import edu.cn.pjh.control.SystemUserManager;
 
 
@@ -51,7 +52,7 @@ public class FrmMain extends JFrame implements ActionListener {
 		dlgLogin=new FrmLogin(this,"登陆",true);
 		dlgLogin.setVisible(true);
 	    //菜单
-	   
+	   if(SystemUserManager.currentUser!=null) {
 	    	menu_Manager.add(menuItem_SystemUserManager);
 	    	menuItem_SystemUserManager.addActionListener(this);
 	    	menu_Manager.add(menuItem_BusinessManager);
@@ -61,7 +62,8 @@ public class FrmMain extends JFrame implements ActionListener {
 	    	menu_Manager.add(menuItem_ConsumerManager);
 	    	menuItem_ConsumerManager.addActionListener(this);
 	    	menubar.add(menu_Manager);
-	    
+	   }
+	    	
 	    	menu_Order.add(this.menuItem_beginorder);
 	    	menuItem_beginorder.addActionListener(this);
 	    	menu_Order.add(this.menuItem_cancelorder);
@@ -84,8 +86,15 @@ public class FrmMain extends JFrame implements ActionListener {
 	    	this.setJMenuBar(menubar);
 	    //状态栏
 	    statusBar.setLayout(new FlowLayout(FlowLayout.LEFT));
-	    JLabel label=new JLabel("您好!"+SystemUserManager.currentUser.getUsername());
+	    if(SystemUserManager.currentUser!=null) {
+	    JLabel label=new JLabel("您好!管理员"+SystemUserManager.currentUser.getUsername());
+	    statusBar.add(label);}
+	    else {
+	    JLabel label=new JLabel("您好!用户"+ConsumerManager.currentConsumer.getConsumername());
 	    statusBar.add(label);
+	    }
+	    
+	    
 	    this.getContentPane().add(statusBar,BorderLayout.SOUTH);
 	    this.addWindowListener(new WindowAdapter(){
 	    	public void windowClosing(WindowEvent e){ 

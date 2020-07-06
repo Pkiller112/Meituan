@@ -24,8 +24,9 @@ public class ProductTypesManager implements IProductTypesManager{
 		java.sql.PreparedStatement pst=null;
 		try {
 			conn=DBUtil.getConnection();
-			sql="select tpe_id,tpe_name,tpe_num,tpe_content,bsn_id from pp_product_types ";			
-
+			sql="select tpe_id,tpe_name,tpe_num,tpe_content,bsn_id from pp_product_types where bsn_id=?";			
+			pst=conn.prepareStatement(sql);
+			pst.setInt(1, bsnid);
 			java.sql.ResultSet rs=pst.executeQuery();
 			while(rs.next()){
 				BeanProductType u=new BeanProductType();
@@ -92,7 +93,7 @@ public class ProductTypesManager implements IProductTypesManager{
 		try {
 			conn=DBUtil.getConnection();
 
-			String sql="update pp_product_types set tpe_name=?,tpe_content? where tpe_id=?";
+			String sql="update pp_product_types set tpe_name=?,tpe_content=? where tpe_id=?";
 			java.sql.PreparedStatement pst=conn.prepareStatement(sql);
 			pst.setString(1, b.getTypename());
 			pst.setString(2, b.getContent());

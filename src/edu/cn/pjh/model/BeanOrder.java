@@ -13,7 +13,14 @@ public class BeanOrder {
 	private int couponid;
 	private Date createTime;
 	private Date askTime;
+	private Date finTime;
 	private int addressid;
+	public Date getFinTime() {
+		return finTime;
+	}
+	public void setFinTime(Date finTime) {
+		this.finTime = finTime;
+	}
 	private String orderstatus;
 	public String getOrderBarcade() {
 		return orderBarcade;

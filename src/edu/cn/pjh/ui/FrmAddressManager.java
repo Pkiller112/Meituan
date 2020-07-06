@@ -3,7 +3,6 @@ package edu.cn.pjh.ui;
 import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,7 +10,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
 
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -21,38 +19,36 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import edu.cn.pjh.PPutil;
+import edu.cn.pjh.model.BeanAddress;
 import edu.cn.pjh.model.BeanConsumer;
-import edu.cn.pjh.model.BeanRider;
+import edu.cn.pjh.model.BeanScheme;
 import edu.cn.pjh.util.BaseException;
 
-public class FrmConsumerManager extends JDialog implements ActionListener{
+public class FrmAddressManager extends JDialog implements ActionListener{
+	BeanConsumer consumer=null;
 	private JPanel toolBar = new JPanel();
 	private Button btnAdd = new Button("添加");
 	private Button btnChange = new Button("修改");
 	private Button btnDelete = new Button("删除");
-	private Button btnVip = new Button("开通会员");
-	private Button btnAdr = new Button("地址");
-	private JComboBox cmbState=new JComboBox(new String[]{"","会员"});
 	private JTextField edtKeyword = new JTextField(10);
 	private Button btnSearch = new Button("查询");
-	private Object tblTitle[]={"用户编号","姓名","性别","注册日期","账号","密码","电话","会员到期时间"};
+	private Object tblTitle[]={"地址编号","省","市","区","详细地址","联系人","联系电话"};
 	private Object tblData[][];
-	List<BeanConsumer> Consumers=null;
+	List<BeanAddress> addresses=null;
 	DefaultTableModel tablmod=new DefaultTableModel();
 	private JTable dataTable=new JTable(tablmod);
 	private void reloadTable(){
 		try {
-			Consumers=PPutil.ConsumerManager.searchConsumers(this.cmbState.getSelectedItem().toString(),this.edtKeyword.getText());
-			tblData =new Object[Consumers.size()][8];
-			for(int i=0;i<Consumers.size();i++){
-				tblData[i][0]=Consumers.get(i).getConsumerid();
-				tblData[i][1]=Consumers.get(i).getConsumername();
-				tblData[i][2]=Consumers.get(i).getConsumersex();
-				tblData[i][3]=Consumers.get(i).getRegisterTime();
-				tblData[i][4]=Consumers.get(i).getConsumeraccount();
-				tblData[i][5]=Consumers.get(i).getConsumerpwd();
-				tblData[i][6]=Consumers.get(i).getConsumerphone();
-				tblData[i][7]=Consumers.get(i).getVipDDL();
+			addresses=PPutil.AddressManager.searchAddress(consumer.getConsumerid(),this.edtKeyword.getText());
+			tblData =new Object[addresses.size()][7];
+			for(int i=0;i<addresses.size();i++){
+				tblData[i][0]=addresses.get(i).getAddrid();
+				tblData[i][1]=addresses.get(i).getProvince();
+				tblData[i][2]=addresses.get(i).getCity();
+				tblData[i][3]=addresses.get(i).getArea();
+				tblData[i][4]=addresses.get(i).getContent();
+				tblData[i][5]=addresses.get(i).getCommuicate();
+				tblData[i][6]=addresses.get(i).getPhone();
 			}
 			tablmod.setDataVector(tblData,tblTitle);
 			this.dataTable.validate();
@@ -63,17 +59,15 @@ public class FrmConsumerManager extends JDialog implements ActionListener{
 		}
 	}
 	
-	public FrmConsumerManager(Frame f, String s, boolean b) {
+	public FrmAddressManager(JDialog f, String s, boolean b,BeanConsumer consumer) {
 		super(f, s, b);
+		this.consumer=consumer;
 		toolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
 		toolBar.add(btnAdd);
 		toolBar.add(btnChange);
 		toolBar.add(btnDelete);
-		toolBar.add(cmbState);
 		toolBar.add(edtKeyword);
 		toolBar.add(btnSearch);
-		toolBar.add(btnVip);
-		toolBar.add(btnAdr);
 		this.getContentPane().add(toolBar, BorderLayout.NORTH);
 		//提取现有数据
 		this.reloadTable();
@@ -92,8 +86,6 @@ public class FrmConsumerManager extends JDialog implements ActionListener{
 		this.btnChange.addActionListener(this);
 		this.btnDelete.addActionListener(this);
 		this.btnSearch.addActionListener(this);
-		this.btnVip.addActionListener(this);
-		this.btnAdr.addActionListener(this);
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				//System.exit(0);
@@ -105,7 +97,7 @@ public class FrmConsumerManager extends JDialog implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if(e.getSource()==this.btnAdd){
-			FrmConsumerAdd dlg=new FrmConsumerAdd(this,"添加用户",true);
+			FrmAddressAdd dlg=new FrmAddressAdd(this,"添加地址",true,this.consumer);
 			dlg.setVisible(true);
 				this.reloadTable();
 		}
@@ -115,21 +107,21 @@ public class FrmConsumerManager extends JDialog implements ActionListener{
 				JOptionPane.showMessageDialog(null,  "请选择用户","提示",JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			BeanConsumer b=this.Consumers.get(i);
-			FrmConsumerChange dlg=new FrmConsumerChange(this,"修改用户",true,b);
+			BeanAddress b=this.addresses.get(i);
+			FrmAddressChange dlg=new FrmAddressChange(this,"修改地址",true,b);
 			dlg.setVisible(true);
 				this.reloadTable();
 		}
 		else if(e.getSource()==this.btnDelete){
 			int i=this.dataTable.getSelectedRow();
 			if(i<0) {
-				JOptionPane.showMessageDialog(null,  "用户","提示",JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null,  "请选择用户","提示",JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			BeanConsumer consumer=this.Consumers.get(i);
-			if(JOptionPane.showConfirmDialog(this,"确定删除"+consumer.getConsumerid()+"号用户吗？","确认",JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
+			BeanAddress address=this.addresses.get(i);
+			if(JOptionPane.showConfirmDialog(this,"确定删除"+address.getAddrid()+"号地址吗？","确认",JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
 				try {
-					PPutil.ConsumerManager.deleteConsumer(consumer.getConsumerid());
+					PPutil.AddressManager.deleteAddress(address.getAddrid());
 					this.reloadTable();
 				} catch (BaseException e1) {
 					JOptionPane.showMessageDialog(null, e1.getMessage(),"错误",JOptionPane.ERROR_MESSAGE);
@@ -138,28 +130,6 @@ public class FrmConsumerManager extends JDialog implements ActionListener{
 		}
 		else if(e.getSource()==this.btnSearch){
 			this.reloadTable();
-		}
-		else if(e.getSource()==this.btnVip){
-			int i=this.dataTable.getSelectedRow();
-			if(i<0) {
-				JOptionPane.showMessageDialog(null,  "请选择用户","提示",JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			BeanConsumer b=this.Consumers.get(i);
-			FrmConsumerVip dlg=new FrmConsumerVip(this,"开通会员",true,b);
-			dlg.setVisible(true);
-				this.reloadTable();
-		}
-		else if(e.getSource()==this.btnAdr){
-			int i=this.dataTable.getSelectedRow();
-			if(i<0) {
-				JOptionPane.showMessageDialog(null,  "请选择用户","提示",JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			BeanConsumer b=this.Consumers.get(i);
-			FrmAddressManager dlg=new FrmAddressManager(this,"登记地址",true,b);
-			dlg.setVisible(true);
-				this.reloadTable();
 		}
 	}
 }
